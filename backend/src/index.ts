@@ -1,4 +1,5 @@
 import { App } from "./infrastructure/server/app";
+
 import dotenv from "dotenv";
 
 dotenv.config();

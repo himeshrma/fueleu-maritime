@@ -103,3 +103,5 @@ export class App {
     return this.app;
   }
 }
+const appInstance = new App().getExpressApp();
+export default appInstance;
