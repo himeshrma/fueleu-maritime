@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Route {
+  id               Int      @id @default(autoincrement())
+  routeId          String   @unique @map("route_id")
+  vesselType       String   @map("vessel_type")
+  fuelType         String   @map("fuel_type")
+  year             Int
+  ghgIntensity     Decimal  @map("ghg_intensity") @db.Decimal(10, 4)
+  fuelConsumption  Decimal  @map("fuel_consumption") @db.Decimal(10, 2)
+  distance         Decimal  @db.Decimal(10, 2)
+  totalEmissions   Decimal  @map("total_emissions") @db.Decimal(10, 2)
+  isBaseline       Boolean  @default(false) @map("is_baseline")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@index([year])
+  @@index([isBaseline])
+  @@map("routes")
+}
+
+model ShipCompliance {
+  id               Int      @id @default(autoincrement())
+  shipId           String   @map("ship_id")
+  year             Int
+  cbGco2eq         Decimal  @map("cb_gco2eq") @db.Decimal(15, 2)
+  targetIntensity  Decimal  @map("target_intensity") @db.Decimal(10, 4)
+  actualIntensity  Decimal  @map("actual_intensity") @db.Decimal(10, 4)
+  energyInScope    Decimal  @map("energy_in_scope") @db.Decimal(15, 2)
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@unique([shipId, year])
+  @@index([shipId, year])
+  @@map("ship_compliance")
+}
+
+model BankEntry {
+  id            Int      @id @default(autoincrement())
+  shipId        String   @map("ship_id")
+  year          Int
+  amountGco2eq  Decimal  @map("amount_gco2eq") @db.Decimal(15, 2)
+  status        String   @default("available")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([shipId, year, status])
+  @@map("bank_entries")
+}
+
+model Pool {
+  id              Int          @id @default(autoincrement())
+  year            Int
+  totalCbBefore   Decimal      @map("total_cb_before") @db.Decimal(15, 2)
+  totalCbAfter    Decimal      @map("total_cb_after") @db.Decimal(15, 2)
+  createdAt       DateTime     @default(now()) @map("created_at")
+  members         PoolMember[]
+
+  @@index([year])
+  @@map("pools")
+}
+
+model PoolMember {
+  id        Int      @id @default(autoincrement())
+  poolId    Int      @map("pool_id")
+  shipId    String   @map("ship_id")
+  cbBefore  Decimal  @map("cb_before") @db.Decimal(15, 2)
+  cbAfter   Decimal  @map("cb_after") @db.Decimal(15, 2)
+  createdAt DateTime @default(now()) @map("created_at")
+  pool      Pool     @relation(fields: [poolId], references: [id], onDelete: Cascade)
+
+  @@index([poolId])
+  @@map("pool_members")
+}
