@@ -1,25 +1,41 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import { Layout } from "./adapters/ui/components/Layout";
+import { Tabs } from "./adapters/ui/components/Tabs";
+import { RoutesTab } from "./adapters/ui/pages/RoutesTab";
+import { CompareTab } from "./adapters/ui/pages/CompareTab";
+import { BankingTab } from "./adapters/ui/pages/BankingTab";
+import { PoolingTab } from "./adapters/ui/pages/PoolingTab";
+
+const tabs = [
+  { id: "routes", label: "Routes" },
+  { id: "compare", label: "Compare" },
+  { id: "banking", label: "Banking" },
+  { id: "pooling", label: "Pooling" },
+];
 
 function App() {
+  const [activeTab, setActiveTab] = useState("routes");
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case "routes":
+        return <RoutesTab />;
+      case "compare":
+        return <CompareTab />;
+      case "banking":
+        return <BankingTab />;
+      case "pooling":
+        return <PoolingTab />;
+      default:
+        return <RoutesTab />;
+    }
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Layout>
+      <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
+      {renderTabContent()}
+    </Layout>
   );
 }
 
